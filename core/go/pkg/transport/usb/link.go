@@ -13,6 +13,7 @@ const (
 	muxHeaderSize     = 21
 	muxPayloadLenFrom = 13
 	muxPayloadLenTo   = 17
+	maxMuxPayloadSize = 1 << 20 // 1 MiB MVP safety cap to avoid unbounded allocations.
 )
 
 // Link defines a minimal USB transport capable of sending and receiving mux frames.
@@ -41,8 +42,8 @@ func (l *streamLink) ReadFrame(ctx context.Context) (*mux.Frame, error) {
 	}
 
 	payloadLen := binary.BigEndian.Uint32(header[muxPayloadLenFrom:muxPayloadLenTo])
-	if int(payloadLen) < 0 || int(payloadLen) > maxPayloadSize() {
-		return nil, fmt.Errorf("%w: %d", mux.ErrInvalidLength, payloadLen)
+	if payloadLen > maxMuxPayloadSize {
+		return nil, fmt.Errorf("%w: payload length %d exceeds max %d", mux.ErrInvalidLength, payloadLen, maxMuxPayloadSize)
 	}
 
 	frameBytes := make([]byte, muxHeaderSize+int(payloadLen))
@@ -69,6 +70,8 @@ func (l *streamLink) WriteFrame(ctx context.Context, frame *mux.Frame) error {
 	return writeAllWithContext(ctx, l.rw, encoded)
 }
 
+// readExactWithContext polls ctx cooperatively between Read calls.
+// Cancellation is best-effort and cannot interrupt a blocking Read unless the underlying IO supports deadlines/cancelation.
 func readExactWithContext(ctx context.Context, r io.Reader, buf []byte) error {
 	for off := 0; off < len(buf); {
 		if err := ctx.Err(); err != nil {
@@ -78,6 +81,9 @@ func readExactWithContext(ctx context.Context, r io.Reader, buf []byte) error {
 		n, err := r.Read(buf[off:])
 		off += n
 		if err != nil {
+			if off == len(buf) {
+				return nil
+			}
 			return err
 		}
 		if n == 0 {
@@ -87,6 +93,8 @@ func readExactWithContext(ctx context.Context, r io.Reader, buf []byte) error {
 	return nil
 }
 
+// writeAllWithContext polls ctx cooperatively between Write calls.
+// Cancellation is best-effort and cannot interrupt a blocking Write unless the underlying IO supports deadlines/cancelation.
 func writeAllWithContext(ctx context.Context, w io.Writer, buf []byte) error {
 	for off := 0; off < len(buf); {
 		if err := ctx.Err(); err != nil {
@@ -103,9 +111,4 @@ func writeAllWithContext(ctx context.Context, w io.Writer, buf []byte) error {
 		}
 	}
 	return nil
-}
-
-func maxPayloadSize() int {
-	maxInt := int(^uint(0) >> 1)
-	return maxInt - muxHeaderSize
 }
