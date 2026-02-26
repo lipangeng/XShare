@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "xshare-android"
 include(":app")
+include(":corebridge")
