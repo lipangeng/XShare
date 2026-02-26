@@ -3,6 +3,8 @@ package controller
 import (
 	"errors"
 	"sync"
+
+	"xshare/core/pkg/diag"
 )
 
 var (
@@ -20,10 +22,14 @@ const (
 type Controller struct {
 	mu    sync.Mutex
 	state state
+	stats *diag.Stats
 }
 
 func NewController() *Controller {
-	return &Controller{state: stateIdle}
+	return &Controller{
+		state: stateIdle,
+		stats: diag.NewStats(),
+	}
 }
 
 func (c *Controller) StartForward() error {
@@ -48,4 +54,8 @@ func (c *Controller) StopForward() error {
 
 	c.state = stateIdle
 	return nil
+}
+
+func (c *Controller) Stats() *diag.Stats {
+	return c.stats
 }
