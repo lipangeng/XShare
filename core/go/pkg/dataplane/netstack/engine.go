@@ -23,9 +23,7 @@ type Engine struct {
 }
 
 func NewEngine() *Engine {
-	return &Engine{
-		outbound: make(chan []byte, 64),
-	}
+	return &Engine{}
 }
 
 func (e *Engine) Start() error {
@@ -36,8 +34,9 @@ func (e *Engine) Start() error {
 		return nil
 	}
 
-	e.started = true
 	e.stopCh = make(chan struct{})
+	e.outbound = make(chan []byte, 64)
+	e.started = true
 	return nil
 }
 
@@ -52,6 +51,7 @@ func (e *Engine) Stop() error {
 	e.started = false
 	close(e.stopCh)
 	e.stopCh = nil
+	e.outbound = nil
 	return nil
 }
 
@@ -60,22 +60,22 @@ func (e *Engine) InjectInbound(packet []byte) error {
 		return ErrShortPacket
 	}
 
-	e.mu.RLock()
-	started := e.started
-	stopCh := e.stopCh
-	e.mu.RUnlock()
+	copyPacket := append([]byte(nil), packet...)
 
-	if !started {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+
+	if !e.started || e.outbound == nil {
 		return ErrEngineStopped
 	}
 
-	copyPacket := append([]byte(nil), packet...)
 	select {
 	case e.outbound <- copyPacket:
 		return nil
-	case <-stopCh:
-		return ErrEngineStopped
 	default:
+		if !e.started {
+			return ErrEngineStopped
+		}
 		return ErrOutboundQueueFull
 	}
 }
