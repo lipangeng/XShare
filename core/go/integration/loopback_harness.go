@@ -37,11 +37,18 @@ func (h *loopbackHarness) SendAndReceive(ctx context.Context, packet []byte) ([]
 		Seq:      1,
 		Payload:  append([]byte(nil), packet...),
 	}
+	h.transport.setWriteContext(ctx)
+	defer h.transport.setWriteContext(nil)
+
 	if err := h.link.WriteFrame(ctx, request); err != nil {
 		return nil, err
 	}
 
-	written := h.transport.takeWrittenFrame()
+	written, err := h.transport.takeWrittenFrame(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	responseWire, err := h.responder.respond(written)
 	if err != nil {
 		return nil, err
@@ -57,8 +64,10 @@ func (h *loopbackHarness) SendAndReceive(ctx context.Context, packet []byte) ([]
 }
 
 type mockUSBTransport struct {
-	mu        sync.Mutex
-	readBuf   bytes.Buffer
+	mu       sync.Mutex
+	readBuf  bytes.Buffer
+	writeCtx context.Context
+
 	writtenCh chan []byte
 }
 
@@ -78,18 +87,45 @@ func (m *mockUSBTransport) Read(p []byte) (int, error) {
 
 func (m *mockUSBTransport) Write(p []byte) (int, error) {
 	frame := append([]byte(nil), p...)
-	m.writtenCh <- frame
-	return len(p), nil
+	ctx := m.currentWriteContext()
+	if ctx == nil {
+		m.writtenCh <- frame
+		return len(p), nil
+	}
+
+	select {
+	case m.writtenCh <- frame:
+		return len(p), nil
+	case <-ctx.Done():
+		return 0, ctx.Err()
+	}
 }
 
-func (m *mockUSBTransport) takeWrittenFrame() []byte {
-	return <-m.writtenCh
+func (m *mockUSBTransport) takeWrittenFrame(ctx context.Context) ([]byte, error) {
+	select {
+	case frame := <-m.writtenCh:
+		return frame, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
 }
 
 func (m *mockUSBTransport) enqueueReadableFrame(frame []byte) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	_, _ = m.readBuf.Write(frame)
+}
+
+func (m *mockUSBTransport) setWriteContext(ctx context.Context) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.writeCtx = ctx
+}
+
+func (m *mockUSBTransport) currentWriteContext() context.Context {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.writeCtx
 }
 
 type fakeOutboundResponder struct{}
