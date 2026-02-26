@@ -56,6 +56,14 @@ func (c *Controller) StopForward() error {
 	return nil
 }
 
-func (c *Controller) Stats() *diag.Stats {
-	return c.stats
+func (c *Controller) Stats() diag.Snapshot {
+	c.mu.Lock()
+	stats := c.stats
+	if stats == nil {
+		stats = diag.NewStats()
+		c.stats = stats
+	}
+	c.mu.Unlock()
+
+	return stats.Snapshot()
 }

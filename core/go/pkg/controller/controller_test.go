@@ -126,3 +126,34 @@ func TestController_StopForward_ConcurrentFromRunning_ExactlyOneSuccess(t *testi
 		t.Fatalf("expected %d ErrForwardAlreadyIdle results, got %d", n-1, alreadyIdle)
 	}
 }
+
+func TestController_Stats_ZeroValueControllerSafe(t *testing.T) {
+	var ctrl Controller
+
+	snap := ctrl.Stats()
+
+	if snap.UplinkPackets != 0 {
+		t.Fatalf("expected zero uplink packets, got %d", snap.UplinkPackets)
+	}
+	if snap.DownlinkPackets != 0 {
+		t.Fatalf("expected zero downlink packets, got %d", snap.DownlinkPackets)
+	}
+}
+
+func TestController_Stats_ReturnsImmutableSnapshot(t *testing.T) {
+	ctrl := NewController()
+	ctrl.stats.IncUplinkPackets(7)
+	ctrl.stats.IncDownlinkPackets(4)
+
+	snap := ctrl.Stats()
+	snap.UplinkPackets = 999
+	snap.DownlinkPackets = 999
+
+	current := ctrl.Stats()
+	if current.UplinkPackets != 7 {
+		t.Fatalf("expected uplink to remain 7, got %d", current.UplinkPackets)
+	}
+	if current.DownlinkPackets != 4 {
+		t.Fatalf("expected downlink to remain 4, got %d", current.DownlinkPackets)
+	}
+}
