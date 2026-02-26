@@ -62,21 +62,28 @@ func (e *Engine) InjectInbound(packet []byte) error {
 
 	copyPacket := append([]byte(nil), packet...)
 
-	e.mu.Lock()
-	defer e.mu.Unlock()
+	e.mu.RLock()
+	started := e.started
+	stopCh := e.stopCh
+	outbound := e.outbound
+	e.mu.RUnlock()
 
-	if !e.started || e.outbound == nil {
+	if !started || stopCh == nil || outbound == nil {
 		return ErrEngineStopped
 	}
 
 	select {
-	case e.outbound <- copyPacket:
+	case <-stopCh:
+		return ErrEngineStopped
+	case outbound <- copyPacket:
 		return nil
 	default:
-		if !e.started {
+		select {
+		case <-stopCh:
 			return ErrEngineStopped
+		default:
+			return ErrOutboundQueueFull
 		}
-		return ErrOutboundQueueFull
 	}
 }
 
@@ -84,9 +91,10 @@ func (e *Engine) ReadOutbound(ctx context.Context) ([]byte, error) {
 	e.mu.RLock()
 	started := e.started
 	stopCh := e.stopCh
+	outbound := e.outbound
 	e.mu.RUnlock()
 
-	if !started {
+	if !started || stopCh == nil || outbound == nil {
 		return nil, ErrEngineStopped
 	}
 
@@ -95,7 +103,7 @@ func (e *Engine) ReadOutbound(ctx context.Context) ([]byte, error) {
 		return nil, ctx.Err()
 	case <-stopCh:
 		return nil, ErrEngineStopped
-	case packet := <-e.outbound:
+	case packet := <-outbound:
 		return packet, nil
 	}
 }
