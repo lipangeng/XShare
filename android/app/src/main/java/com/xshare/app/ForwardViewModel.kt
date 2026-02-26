@@ -7,21 +7,29 @@ class ForwardViewModel(
     private val bridge: Bridge
 ) : ViewModel() {
     enum class State {
-        Idle,
+        Stopped,
         Running,
         Error
     }
 
     data class StateHolder<T>(var value: T)
 
-    val state = StateHolder(State.Idle)
+    val state = StateHolder(State.Stopped)
 
     fun startForward() {
-        state.value = if (bridge.startForwarding()) State.Running else State.Error
+        state.value = try {
+            if (bridge.startForwarding()) State.Running else State.Error
+        } catch (_: Throwable) {
+            State.Error
+        }
     }
 
     fun stopForward() {
-        bridge.stopForwarding()
-        state.value = State.Idle
+        state.value = try {
+            bridge.stopForwarding()
+            State.Stopped
+        } catch (_: Throwable) {
+            State.Error
+        }
     }
 }
