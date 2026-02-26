@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package xshare.control.v1;
+
+option go_package = "xshare/protocol/gen/go/control/v1;controlv1";
+
+message ErrorModel {
+  string code = 1;
+  string message = 2;
+  string details = 3;
+}
+
+message ControlMessageBase {
+  string version = 1;
+  string request_id = 2;
+  string correlation_id = 3;
+  ErrorModel error = 4;
+}
+
+message ForwardStartRequest {
+  ControlMessageBase base = 1;
+  string transfer_id = 2;
+  string source_path = 3;
+  string destination_path = 4;
+}
+
+message ForwardStartResponse {
+  ControlMessageBase base = 1;
+  bool accepted = 2;
+}
+
+service ControlService {
+  rpc ForwardStart(ForwardStartRequest) returns (ForwardStartResponse);
+}

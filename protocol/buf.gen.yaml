@@ -1,2 +1,6 @@
 version: v2
-plugins: []
+plugins:
+  - remote: buf.build/protocolbuffers/go
+    out: ../core/go/pkg/gen
+    opt:
+      - paths=source_relative

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package xshare.ota.v1;
+
+option go_package = "xshare/protocol/gen/go/ota/v1;otav1";
+
+message OtaManifestRequest {
+  string device_id = 1;
+  string current_version = 2;
+}
+
+message OtaManifestResponse {
+  string target_version = 1;
+  string download_url = 2;
+  string sha256 = 3;
+  uint64 size_bytes = 4;
+}
