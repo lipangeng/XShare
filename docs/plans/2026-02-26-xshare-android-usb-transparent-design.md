@@ -41,7 +41,7 @@ Android System Network
 - `ctrl_agent`: config/state/log/start-stop forwarding.
 - `ota_agent`: OTA chunk receive, integrity verify, partition switch, rollback.
 
-### 2.2 Go core (`core/go`)
+### 2.2 Go core (`core`)
 - `transport/usb`: Android USB host read/write, frame reassembly, flow control.
 - `protocol`: protobuf message handling and version/error conventions.
 - `dataplane/netstack`: gVisor netstack integration.
@@ -184,7 +184,7 @@ XShare/
 
 Build/run baseline:
 1. `cd protocol && buf generate`
-2. `cd core/go && go test ./...`
+2. `cd core && go test ./...`
 3. `cd firmware/esp32 && idf.py build flash monitor`
 4. `cd android && ./gradlew assembleDebug`
 5. Open app, grant USB access, click Start Forwarding, verify counters/logs.
@@ -207,7 +207,7 @@ Build/run baseline:
 
 ### 5.3 Key interface skeletons
 
-`core/go/pkg/transport/usb/link.go`
+`core/pkg/transport/usb/link.go`
 ```go
 type Link interface {
     ReadFrame(ctx context.Context) (*mux.Frame, error)
@@ -215,7 +215,7 @@ type Link interface {
 }
 ```
 
-`core/go/pkg/dataplane/netstack/engine.go`
+`core/pkg/dataplane/netstack/engine.go`
 ```go
 type Engine interface {
     InjectInbound(pkt []byte) error
@@ -225,7 +225,7 @@ type Engine interface {
 }
 ```
 
-`core/go/pkg/forwarder/forwarder.go`
+`core/pkg/forwarder/forwarder.go`
 ```go
 type Forwarder struct { /* tcp/udp session table */ }
 func (f *Forwarder) HandleFromNetstack(pkt []byte) error { /* open/reuse socket */ }

@@ -17,8 +17,8 @@
 - Create: `firmware/esp32/main/main.c`
 - Create: `firmware/esp32/CMakeLists.txt`
 - Create: `firmware/esp32/sdkconfig.defaults`
-- Create: `core/go/go.mod`
-- Create: `core/go/cmd/xshare-daemon/main.go`
+- Create: `core.mod`
+- Create: `core/cmd/xshare-daemon/main.go`
 - Create: `android/settings.gradle.kts`
 - Create: `android/build.gradle.kts`
 - Create: `android/app/build.gradle.kts`
@@ -28,7 +28,7 @@
 
 **Step 1: Write the failing test**
 
-Create `core/go/cmd/xshare-daemon/main_test.go`:
+Create `core/cmd/xshare-daemon/main_test.go`:
 ```go
 package main
 
@@ -43,12 +43,12 @@ func TestVersionStringNonEmpty(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./cmd/xshare-daemon -v`
+Run: `cd core && go test ./cmd/xshare-daemon -v`
 Expected: FAIL with `undefined: version`.
 
 **Step 3: Write minimal implementation**
 
-In `core/go/cmd/xshare-daemon/main.go` add:
+In `core/cmd/xshare-daemon/main.go` add:
 ```go
 package main
 
@@ -63,7 +63,7 @@ func main() {
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./cmd/xshare-daemon -v`
+Run: `cd core && go test ./cmd/xshare-daemon -v`
 Expected: PASS.
 
 **Step 5: Commit**
@@ -84,7 +84,7 @@ git commit -m "chore: scaffold xshare monorepo skeleton"
 
 **Step 1: Write the failing test**
 
-Create `core/go/pkg/api/proto_contract_test.go`:
+Create `core/pkg/api/proto_contract_test.go`:
 ```go
 package api
 
@@ -99,13 +99,13 @@ func TestControlMethodForwardStartExists(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/api -v`
+Run: `cd core && go test ./pkg/api -v`
 Expected: FAIL with `undefined: MethodForwardStart`.
 
 **Step 3: Write minimal implementation**
 
 - Define protobuf enums/messages with required fields: `version`, `request_id`, `correlation_id`, error model.
-- Add a generated constants shim in `core/go/pkg/api/constants.go`:
+- Add a generated constants shim in `core/pkg/api/constants.go`:
 ```go
 package api
 
@@ -115,22 +115,22 @@ const MethodForwardStart = "forward.start"
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./pkg/api -v`
+Run: `cd core && go test ./pkg/api -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add protocol core/go/pkg/api
+git add protocol core/pkg/api
 git commit -m "feat(protocol): add protobuf contracts for control data ota"
 ```
 
 ### Task 3: Implement USB MUX Frame Codec in Go
 
 **Files:**
-- Create: `core/go/pkg/protocol/mux/frame.go`
-- Create: `core/go/pkg/protocol/mux/codec.go`
-- Create: `core/go/pkg/protocol/mux/codec_test.go`
+- Create: `core/pkg/protocol/mux/frame.go`
+- Create: `core/pkg/protocol/mux/codec.go`
+- Create: `core/pkg/protocol/mux/codec_test.go`
 
 **Step 1: Write the failing test**
 
@@ -148,7 +148,7 @@ func TestEncodeDecodeRoundTrip(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/protocol/mux -v`
+Run: `cd core && go test ./pkg/protocol/mux -v`
 Expected: FAIL with missing `Encode/Decode`.
 
 **Step 3: Write minimal implementation**
@@ -157,22 +157,22 @@ Implement frame struct + binary codec with CRC32 verification.
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./pkg/protocol/mux -v`
+Run: `cd core && go test ./pkg/protocol/mux -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add core/go/pkg/protocol/mux
+git add core/pkg/protocol/mux
 git commit -m "feat(core): add usb mux frame codec"
 ```
 
 ### Task 4: Build Go USB Transport Abstraction
 
 **Files:**
-- Create: `core/go/pkg/transport/usb/link.go`
-- Create: `core/go/pkg/transport/usb/link_test.go`
-- Create: `core/go/pkg/transport/usb/mockio.go`
+- Create: `core/pkg/transport/usb/link.go`
+- Create: `core/pkg/transport/usb/link_test.go`
+- Create: `core/pkg/transport/usb/mockio.go`
 
 **Step 1: Write the failing test**
 
@@ -191,7 +191,7 @@ func TestLinkReadWriteFrame(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/transport/usb -v`
+Run: `cd core && go test ./pkg/transport/usb -v`
 Expected: FAIL with undefined `NewLink`.
 
 **Step 3: Write minimal implementation**
@@ -200,21 +200,21 @@ Implement `Link` interface and a blocking read/write loop using mux codec.
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./pkg/transport/usb -v`
+Run: `cd core && go test ./pkg/transport/usb -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add core/go/pkg/transport/usb
+git add core/pkg/transport/usb
 git commit -m "feat(core): add usb transport abstraction"
 ```
 
 ### Task 5: Integrate gVisor Netstack Engine Skeleton
 
 **Files:**
-- Create: `core/go/pkg/dataplane/netstack/engine.go`
-- Create: `core/go/pkg/dataplane/netstack/engine_test.go`
+- Create: `core/pkg/dataplane/netstack/engine.go`
+- Create: `core/pkg/dataplane/netstack/engine_test.go`
 
 **Step 1: Write the failing test**
 
@@ -232,7 +232,7 @@ func TestEngineInjectAndRead(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/dataplane/netstack -v`
+Run: `cd core && go test ./pkg/dataplane/netstack -v`
 Expected: FAIL with undefined `NewEngine`.
 
 **Step 3: Write minimal implementation**
@@ -241,21 +241,21 @@ Implement engine scaffold and validation; wire placeholder channels for packet p
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./pkg/dataplane/netstack -v`
+Run: `cd core && go test ./pkg/dataplane/netstack -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add core/go/pkg/dataplane/netstack
+git add core/pkg/dataplane/netstack
 git commit -m "feat(core): add netstack engine scaffold"
 ```
 
 ### Task 6: Implement Forwarder (TCP/UDP session bridge)
 
 **Files:**
-- Create: `core/go/pkg/forwarder/forwarder.go`
-- Create: `core/go/pkg/forwarder/forwarder_test.go`
+- Create: `core/pkg/forwarder/forwarder.go`
+- Create: `core/pkg/forwarder/forwarder_test.go`
 
 **Step 1: Write the failing test**
 
@@ -271,7 +271,7 @@ func TestForwarderCreateUDPMapping(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/forwarder -v`
+Run: `cd core && go test ./pkg/forwarder -v`
 Expected: FAIL with undefined `New`.
 
 **Step 3: Write minimal implementation**
@@ -280,21 +280,21 @@ Implement in-memory session table with timeout metadata; no optimization yet.
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./pkg/forwarder -v`
+Run: `cd core && go test ./pkg/forwarder -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add core/go/pkg/forwarder
+git add core/pkg/forwarder
 git commit -m "feat(core): add tcp udp session forwarder table"
 ```
 
 ### Task 7: Add Controller State Machine and Control APIs
 
 **Files:**
-- Create: `core/go/pkg/controller/controller.go`
-- Create: `core/go/pkg/controller/controller_test.go`
+- Create: `core/pkg/controller/controller.go`
+- Create: `core/pkg/controller/controller_test.go`
 
 **Step 1: Write the failing test**
 
@@ -309,7 +309,7 @@ func TestStartStopStateTransition(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/controller -v`
+Run: `cd core && go test ./pkg/controller -v`
 Expected: FAIL with undefined `NewController`.
 
 **Step 3: Write minimal implementation**
@@ -318,13 +318,13 @@ Implement state machine: `Idle -> Running -> Idle`, with guard checks and error 
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./pkg/controller -v`
+Run: `cd core && go test ./pkg/controller -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add core/go/pkg/controller
+git add core/pkg/controller
 git commit -m "feat(core): add forwarding controller state machine"
 ```
 
@@ -413,8 +413,8 @@ git commit -m "feat(android): add app skeleton and core jni bridge"
 ### Task 10: End-to-End Loopback Integration Test (Host-side)
 
 **Files:**
-- Create: `core/go/integration/loopback_e2e_test.go`
-- Create: `core/go/integration/testdata/sample_ipv4_udp.bin`
+- Create: `core/integration/loopback_e2e_test.go`
+- Create: `core/integration/testdata/sample_ipv4_udp.bin`
 
 **Step 1: Write the failing test**
 
@@ -434,7 +434,7 @@ func TestE2E_UplinkToDownlinkLoopback(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./integration -v`
+Run: `cd core && go test ./integration -v`
 Expected: FAIL with missing harness.
 
 **Step 3: Write minimal implementation**
@@ -443,22 +443,22 @@ Implement harness with mock USB transport and fake outbound responder.
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./integration -v`
+Run: `cd core && go test ./integration -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add core/go/integration
+git add core/integration
 git commit -m "test(core): add e2e loopback integration harness"
 ```
 
 ### Task 11: Diagnostics and Runtime Stats API
 
 **Files:**
-- Create: `core/go/pkg/diag/stats.go`
-- Modify: `core/go/pkg/controller/controller.go`
-- Create: `core/go/pkg/diag/stats_test.go`
+- Create: `core/pkg/diag/stats.go`
+- Modify: `core/pkg/controller/controller.go`
+- Create: `core/pkg/diag/stats_test.go`
 
 **Step 1: Write the failing test**
 
@@ -473,7 +473,7 @@ func TestStatsCounterIncrement(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/diag -v`
+Run: `cd core && go test ./pkg/diag -v`
 Expected: FAIL with undefined `NewStats`.
 
 **Step 3: Write minimal implementation**
@@ -482,13 +482,13 @@ Implement atomic counters and controller hook for `forward.get_stats`.
 
 **Step 4: Run test to verify it passes**
 
-Run: `cd core/go && go test ./pkg/diag -v`
+Run: `cd core && go test ./pkg/diag -v`
 Expected: PASS.
 
 **Step 5: Commit**
 
 ```bash
-git add core/go/pkg/diag core/go/pkg/controller
+git add core/pkg/diag core/pkg/controller
 git commit -m "feat(core): add runtime stats and diagnostics api"
 ```
 
@@ -501,7 +501,7 @@ git commit -m "feat(core): add runtime stats and diagnostics api"
 
 **Step 1: Write the failing test**
 
-Create `core/go/pkg/controller/verify_contract_test.go`:
+Create `core/pkg/controller/verify_contract_test.go`:
 ```go
 func TestForwardStartThenStatsNonZeroContract(t *testing.T) {
 	c := NewController()
@@ -513,7 +513,7 @@ func TestForwardStartThenStatsNonZeroContract(t *testing.T) {
 
 **Step 2: Run test to verify it fails**
 
-Run: `cd core/go && go test ./pkg/controller -v`
+Run: `cd core && go test ./pkg/controller -v`
 Expected: FAIL if `Stats()` missing.
 
 **Step 3: Write minimal implementation**
@@ -523,14 +523,14 @@ Add missing controller `Stats()` access, write verification script:
 #!/usr/bin/env bash
 set -euo pipefail
 cd protocol && buf generate
-cd ../core/go && go test ./...
+cd ../core && go test ./...
 cd ../../android && ./gradlew :app:testDebugUnitTest
 ```
 
 **Step 4: Run test to verify it passes**
 
 Run:
-- `cd core/go && go test ./pkg/controller -v`
+- `cd core && go test ./pkg/controller -v`
 - `bash tools/verify-mvp.sh`
 
 Expected: PASS on contract test and verification script.
@@ -538,7 +538,7 @@ Expected: PASS on contract test and verification script.
 **Step 5: Commit**
 
 ```bash
-git add docs tools core/go/pkg/controller
+git add docs tools core/pkg/controller
 git commit -m "docs: add mvp bringup and verification workflow"
 ```
 

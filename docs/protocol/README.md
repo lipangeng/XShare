@@ -28,11 +28,11 @@ cd protocol
 buf generate
 ```
 
-Generated Go output is configured to land in `core/go/pkg/gen`.
+Generated Go output is configured to land in `core/pkg/gen`.
 
 ## Contract Notes
 
-Current implementation exposes one control method constant in `core/go/pkg/api`:
+Current implementation exposes one control method constant in `core/pkg/api`:
 
 - `forward.start` (`MethodForwardStart`)
 

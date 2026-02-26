@@ -30,7 +30,7 @@ echo "==> generating protocol code"
 
 echo "==> running Go tests"
 (
-  cd "${ROOT_DIR}/core/go"
+  cd "${ROOT_DIR}/core"
   go test ./...
 )
 

@@ -23,17 +23,17 @@ This runs, in order:
 
 1. Prerequisite checks.
 2. `buf generate` in `protocol/`.
-3. `go test ./...` in `core/go/`.
+3. `go test ./...` in `core/`.
 4. `./gradlew :app:testDebugUnitTest` in `android/`.
 
-`buf generate` can update generated files under `core/go/pkg/gen`, so running `tools/verify-mvp.sh` can mutate your workspace.
+`buf generate` can update generated files under `core/pkg/gen`, so running `tools/verify-mvp.sh` can mutate your workspace.
 
 ## Focused Controller Contract Check
 
 To validate controller start/stats contract only:
 
 ```bash
-cd core/go
+cd core
 go test ./pkg/controller -v
 ```
 
