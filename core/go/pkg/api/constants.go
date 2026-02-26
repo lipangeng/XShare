@@ -1,3 +1,3 @@
 package api
 
-const MethodForwardStart = "control.v1.ControlService/ForwardStart"
+const MethodForwardStart = "forward.start"

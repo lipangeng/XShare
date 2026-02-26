@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package xshare.data.v1;
 
-option go_package = "xshare/protocol/gen/go/data/v1;datav1";
+option go_package = "xshare/core/pkg/gen/data/v1;datav1";
 
 message DataChunk {
   string transfer_id = 1;

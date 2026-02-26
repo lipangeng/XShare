@@ -2,8 +2,9 @@ package api
 
 import "testing"
 
-func TestMethodForwardStartNonEmpty(t *testing.T) {
-	if MethodForwardStart == "" {
-		t.Fatal("MethodForwardStart must be non-empty")
+func TestMethodForwardStartMatchesControlMethodToken(t *testing.T) {
+	const expected = "forward.start"
+	if MethodForwardStart != expected {
+		t.Fatalf("MethodForwardStart = %q, want %q", MethodForwardStart, expected)
 	}
 }
