@@ -20,7 +20,7 @@ func Encode(frame *Frame) ([]byte, error) {
 	if frame == nil {
 		return nil, ErrNilFrame
 	}
-	if len(frame.Payload) > int(^uint32(0)) {
+	if uint64(len(frame.Payload)) > uint64(^uint32(0)) {
 		return nil, fmt.Errorf("%w: %d", ErrInvalidLength, len(frame.Payload))
 	}
 
@@ -53,8 +53,9 @@ func Decode(data []byte) (*Frame, error) {
 	}
 
 	payloadLen := binary.BigEndian.Uint32(data[13:17])
-	if len(data) != headerSize+int(payloadLen) {
-		return nil, fmt.Errorf("%w: got %d bytes, want %d", ErrInvalidLength, len(data), headerSize+int(payloadLen))
+	expectedLen := uint64(headerSize) + uint64(payloadLen)
+	if uint64(len(data)) != expectedLen {
+		return nil, fmt.Errorf("%w: got %d bytes, want %d", ErrInvalidLength, len(data), expectedLen)
 	}
 
 	expectedCRC := binary.BigEndian.Uint32(data[17:21])
@@ -65,7 +66,7 @@ func Decode(data []byte) (*Frame, error) {
 		return nil, ErrChecksumMismatch
 	}
 
-	payload := make([]byte, payloadLen)
+	payload := make([]byte, len(data)-headerSize)
 	copy(payload, data[headerSize:])
 
 	return &Frame{
