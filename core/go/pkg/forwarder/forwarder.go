@@ -2,6 +2,7 @@ package forwarder
 
 import (
 	"net/netip"
+	"strings"
 	"sync"
 	"time"
 )
@@ -42,10 +43,11 @@ func (f *Forwarder) GetOrCreate(tuple FiveTuple) (*Session, bool) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 
+	tuple = canonicalizeTuple(tuple)
 	now := time.Now()
 	if sess, ok := f.sessions[tuple]; ok {
 		sess.LastSeen = now
-		return sess, false
+		return copySession(sess), false
 	}
 
 	sess := &Session{
@@ -54,11 +56,24 @@ func (f *Forwarder) GetOrCreate(tuple FiveTuple) (*Session, bool) {
 		LastSeen:  now,
 	}
 	f.sessions[tuple] = sess
-	return sess, true
+	return copySession(sess), true
 }
 
 func (f *Forwarder) SessionTimeout() time.Duration {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	return f.sessionTimeout
+}
+
+func canonicalizeTuple(tuple FiveTuple) FiveTuple {
+	tuple.Proto = strings.ToUpper(tuple.Proto)
+	return tuple
+}
+
+func copySession(sess *Session) *Session {
+	if sess == nil {
+		return nil
+	}
+	clone := *sess
+	return &clone
 }
