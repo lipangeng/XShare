@@ -26,6 +26,8 @@ This runs, in order:
 3. `go test ./...` in `core/go/`.
 4. `./gradlew :app:testDebugUnitTest` in `android/`.
 
+`buf generate` can update generated files under `core/go/pkg/gen`, so running `tools/verify-mvp.sh` can mutate your workspace.
+
 ## Focused Controller Contract Check
 
 To validate controller start/stats contract only:
@@ -35,4 +37,4 @@ cd core/go
 go test ./pkg/controller -v
 ```
 
-The contract test `TestForwardStartThenStatsAvailableContract` ensures stats are readable immediately after starting forwarding.
+The contract test verifies public controller API behavior for start/stop transitions and stats snapshot availability.

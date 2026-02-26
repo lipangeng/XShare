@@ -32,10 +32,17 @@ Generated Go output is configured to land in `core/go/pkg/gen`.
 
 ## Contract Notes
 
-MVP control method names are defined in Go constants under `core/go/pkg/api` and include:
+Current implementation exposes one control method constant in `core/go/pkg/api`:
 
-- `forward.start`
+- `forward.start` (`MethodForwardStart`)
+
+Current proto service support matches that scope:
+
+- `ControlService.ForwardStart`
+
+Pending methods are **not implemented yet** in code or proto for this MVP slice:
+
 - `forward.stop`
 - `forward.get_stats`
 
-Keep proto RPC names and these method constants aligned.
+When those methods are added, keep proto RPC names and Go method constants aligned.
