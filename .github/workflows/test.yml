@@ -1,0 +1,21 @@
+name: Test
+
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Hello
+        run: echo "Hello from GitHub Actions!"
+      
+      - name: Check Go
+        run: |
+          cd core/go
+          go version
+          go build ./...
+          go test ./...
