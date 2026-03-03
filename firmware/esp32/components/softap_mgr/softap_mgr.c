@@ -98,7 +98,7 @@ esp_err_t softap_mgr_get_client_count(int *count)
     }
 
     wifi_sta_list_t sta_list;
-    esp_err_t err = esp_wifi_sta_get_list(&sta_list);
+    esp_err_t err = esp_wifi_ap_get_sta_list(&sta_list);
     if (err != ESP_OK) {
         return err;
     }

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">XShare</string>
+    <string name="start_forward">Start Forward</string>
+    <string name="stop_forward">Stop Forward</string>
+    <string name="stats">Statistics</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+</resources>

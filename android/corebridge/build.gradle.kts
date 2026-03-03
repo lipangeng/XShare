@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.xshare.corebridge"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -25,6 +25,9 @@ android {
         release {
             isMinifyEnabled = false
         }
+        debug {
+            isMinifyEnabled = false
+        }
     }
 
     externalNativeBuild {
@@ -34,15 +37,15 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        jvmToolchain(21)
     }
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.15.0")
 }

@@ -15,5 +15,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "XShare"
-include ':app'
-include ':corebridge'
+include(":app")
+include(":corebridge")
