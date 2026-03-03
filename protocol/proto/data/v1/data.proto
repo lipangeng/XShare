@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package xshare.data.v1;
+
+option go_package = "github.com/xshare/xshare/pkg/api/data";
+
+message PacketEnvelope {
+  string version = 1;
+  string packet_id = 2;
+  Direction direction = 3;
+  string if_name = 4;
+  bytes ip_packet = 5;
+}
+
+enum Direction {
+  DIRECTION_UNSPECIFIED = 0;
+  DIRECTION_UPLINK = 1;
+  DIRECTION_DOWNLINK = 2;
+}

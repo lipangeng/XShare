@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package xshare.ota.v1;
+
+option go_package = "github.com/xshare/xshare/pkg/api/ota";
+
+message OtaBegin {
+  string version = 1;
+  int64 total_size = 2;
+  bytes checksum = 3;
+}
+
+message OtaChunk {
+  int32 chunk_index = 1;
+  int32 total_chunks = 2;
+  bytes data = 3;
+}
+
+message OtaCommit {
+  string version = 1;
+}
+
+message OtaAbort {
+  string reason = 1;
+}
+
+message OtaStatus {
+  OtaState state = 1;
+  int32 progress_percent = 2;
+  string message = 3;
+}
+
+enum OtaState {
+  OTA_STATE_IDLE = 0;
+  OTA_STATE_RECEIVING = 1;
+  OTA_STATE_VERIFYING = 2;
+  OTA_STATE_APPLYING = 3;
+  OTA_STATE_COMPLETE = 4;
+  OTA_STATE_FAILED = 5;
+}

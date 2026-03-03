@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package xshare.control.v1;
+
+option go_package = "github.com/xshare/xshare/pkg/api/control";
+
+message RequestEnvelope {
+  string version = 1;
+  string request_id = 2;
+  string correlation_id = 3;
+  int64 timestamp_ms = 4;
+  AuthContext auth_context = 5;
+  oneof payload {
+    HelloRequest hello = 10;
+    GetInfoRequest get_info = 11;
+    SetApConfigRequest set_ap_config = 12;
+    GetClientsRequest get_clients = 13;
+    StartForwardRequest start_forward = 14;
+    StopForwardRequest stop_forward = 15;
+    GetStatsRequest get_stats = 16;
+    SubscribeLogRequest subscribe_log = 17;
+    PingRequest ping = 18;
+    OtaBeginRequest ota_begin = 19;
+    OtaChunkRequest ota_chunk = 20;
+    OtaCommitRequest ota_commit = 21;
+  }
+}
+
+message ResponseEnvelope {
+  string version = 1;
+  string request_id = 2;
+  string correlation_id = 3;
+  int64 timestamp_ms = 4;
+  Error error = 5;
+  oneof payload {
+    HelloResponse hello = 10;
+    GetInfoResponse get_info = 11;
+    SetApConfigResponse set_ap_config = 12;
+    GetClientsResponse get_clients = 13;
+    StartForwardResponse start_forward = 14;
+    StopForwardResponse stop_forward = 15;
+    GetStatsResponse get_stats = 16;
+    SubscribeLogResponse subscribe_log = 17;
+    PingResponse ping = 18;
+    OtaBeginResponse ota_begin = 19;
+    OtaChunkResponse ota_chunk = 20;
+    OtaCommitResponse ota_commit = 21;
+  }
+}
+
+message AuthContext {
+  string auth_type = 1;
+  bytes token = 2;
+}
+
+message Error {
+  int32 code = 1;
+  string message = 2;
+  map<string, string> details = 3;
+}
+
+message HelloRequest {}
+
+message HelloResponse {
+  string device_id = 1;
+  string firmware_version = 2;
+  string protocol_version = 3;
+}
+
+message GetInfoRequest {}
+
+message GetInfoResponse {
+  string device_id = 1;
+  string model = 2;
+  string firmware_version = 3;
+  DeviceState state = 4;
+  WifiStatus wifi_status = 5;
+}
+
+message DeviceState {
+  string status = 1;
+  int64 uptime_ms = 2;
+}
+
+message WifiStatus {
+  bool ap_enabled = 1;
+  string ssid = 2;
+  int32 client_count = 3;
+}
+
+message SetApConfigRequest {
+  string ssid = 1;
+  string password = 2;
+  string gateway_ip = 3;
+  string subnet_mask = 4;
+}
+
+message SetApConfigResponse {}
+
+message GetClientsRequest {}
+
+message GetClientsResponse {
+  repeated ClientInfo clients = 1;
+}
+
+message ClientInfo {
+  string mac = 1;
+  string ip = 2;
+  string hostname = 3;
+  int64 connected_at_ms = 4;
+}
+
+message StartForwardRequest {}
+
+message StartForwardResponse {
+  bool success = 1;
+}
+
+message StopForwardRequest {}
+
+message StopForwardResponse {
+  bool success = 1;
+}
+
+message GetStatsRequest {}
+
+message GetStatsResponse {
+  int64 uplink_packets = 1;
+  int64 uplink_bytes = 2;
+  int64 downlink_packets = 3;
+  int64 downlink_bytes = 4;
+  int32 active_tcp_sessions = 5;
+  int32 active_udp_sessions = 6;
+}
+
+message SubscribeLogRequest {
+  bool subscribe = 1;
+}
+
+message SubscribeLogResponse {}
+
+message LogEntry {
+  int64 timestamp_ms = 1;
+  string level = 2;
+  string message = 3;
+}
+
+message PingRequest {
+  string message = 1;
+}
+
+message PingResponse {
+  string message = 1;
+  int64 latency_ms = 2;
+}
+
+message OtaBeginRequest {
+  string version = 1;
+  int64 total_size = 2;
+  bytes checksum = 3;
+}
+
+message OtaBeginResponse {
+  bool accepted = 1;
+}
+
+message OtaChunkRequest {
+  int32 chunk_index = 1;
+  int32 total_chunks = 2;
+  bytes data = 3;
+}
+
+message OtaChunkResponse {
+  bool accepted = 1;
+}
+
+message OtaCommitRequest {}
+
+message OtaCommitResponse {
+  bool success = 1;
+  string message = 2;
+}
