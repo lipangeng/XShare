@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 class CoreBridgeImpl : CoreBridge {
+    
     init {
         System.loadLibrary("xshare_core")
     }
