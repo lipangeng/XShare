@@ -3,6 +3,8 @@ package controller
 import (
 	"errors"
 	"sync"
+
+	"github.com/xshare/xshare/pkg/diag"
 )
 
 var (
@@ -20,11 +22,13 @@ const (
 type Controller struct {
 	mu    sync.Mutex
 	state State
+	stats *diag.Stats
 }
 
 func NewController() *Controller {
 	return &Controller{
 		state: StateIdle,
+		stats: diag.NewStats(),
 	}
 }
 
@@ -58,4 +62,8 @@ func (c *Controller) State() State {
 
 func (c *Controller) IsRunning() bool {
 	return c.State() == StateRunning
+}
+
+func (c *Controller) Stats() diag.StatsSnapshot {
+	return c.stats.Snapshot()
 }
