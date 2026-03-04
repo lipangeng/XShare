@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main, master]
 
-env:
-  IDF_VERSION: v5.3
-
 jobs:
   # Go Core Build and Test
   go-build:
@@ -38,7 +35,7 @@ jobs:
   esp32-build:
     name: ESP32 Firmware
     runs-on: ubuntu-latest
-    container: espressif/idf:${{ env.IDF_VERSION }}
+    container: espressif/idf:v5.3
     steps:
       - uses: actions/checkout@v4
         with:
