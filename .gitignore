@@ -10,6 +10,9 @@ firmware/esp32/.cache/
 core/go/pkg/
 core/go/cmd/
 
+# Local config (SDK paths vary by environment)
+android/local.properties
+
 # Dependencies
 node_modules/
 vendor/
