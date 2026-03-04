@@ -44,24 +44,12 @@ jobs:
         with:
           submodules: recursive
       
-      - name: Check ESP-IDF
-        run: |
-          . /opt/esp/idf/export.sh
-          echo "IDF_PATH: $IDF_PATH"
-          idf.py --version
-      
       - name: Build ESP32 Firmware
         run: |
           . /opt/esp/idf/export.sh
           cd firmware/esp32
-          idf.py fullclean
-          idf.py build
-      
-      - name: Check build outputs
-        run: |
-          ls -la firmware/esp32/build/
-          ls -la firmware/esp32/build/bootloader/
-          ls -la firmware/esp32/build/partition_table/
+          idf.py -B build fullclean
+          idf.py -B build build
       
       - name: Upload ESP32 Artifacts
         uses: actions/upload-artifact@v4
@@ -106,16 +94,12 @@ jobs:
       - name: Build Android Debug APK
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon
       
       - name: Run Android Tests
         run: |
           cd android
           ./gradlew :app:testDebugUnitTest --no-daemon
-      
-      - name: Check APK output
-        run: |
-          ls -la android/app/build/outputs/apk/debug/
       
       - name: Upload Android APK
         uses: actions/upload-artifact@v4
